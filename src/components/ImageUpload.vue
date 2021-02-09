@@ -1,28 +1,32 @@
 <template>
   <v-container>
     <div v-if="progressInfos">
-      <v-row class="text-center">
+      <v-row class="text-center" justify="center">
       <div class="mb-2"
         v-for="(progressInfo, index) in progressInfos"
         :key="index"
       >
       
-      <v-progress-linear
-        v-model="progressInfo.percentage"
-        color="amber"
-        height="25"
-      >
-        <strong>{{ progressInfo.percentage }}%</strong>
-      </v-progress-linear>
-      <div v-if="progressInfo.percentage === !100">
-        <h4>{{ progressInfo.fileName }} Uploading</h4>
-      </div>
-      <div v-else>
-        <h4>{{ progressInfo.fileName }} Uploaded</h4>
-      </div>
+      <!-- Upload Progress Bars -->
+      <div id="progress-section">
+        <v-progress-linear
+          v-model="progressInfo.percentage"
+          color="blue"
+          height="25"
+        >
+          <strong>{{ progressInfo.percentage }}%</strong>
+        </v-progress-linear>
+        <div v-if="progressInfo.percentage === !100">
+          <h4>{{ progressInfo.fileName }} Uploading</h4>
+        </div>
+        <div v-else>
+          <h4>{{ progressInfo.fileName }} Uploaded</h4>
+        </div>
+        </div>
       </div>
       </v-row>
 
+      <!-- File Upload -->
       <v-row justify="center">
         <v-file-input
           label="File input"
@@ -44,27 +48,34 @@
         </div>
       </v-row>
 
-      <div v-if="message" role="alert">
-        <v-alert 
-        dismissible
-        >
-        <ul>
-          <li v-for="(ms, i) in message.split('\n')" :key="i">
-            {{ ms }}
-            <div>{{ log(ms) }}</div>
-          </li>
-        </ul>
-        </v-alert>
-      </div>
+      <!-- Alert Messages -->
+      <v-row justify="center">
+        <div v-if="message" role="alert" id="alert-message">
+          <v-alert
+          outlined
+          type="warning"
+          prominent
+          border="left"
+          dismissible
+          >
+          <ul>
+            <li v-for="(ms, i) in message.split('\n')" :key="i">
+              {{ ms }}
+              <div>{{ log(ms) }}</div>
+            </li>
+          </ul>
+          </v-alert>
+        </div>
+      </v-row>
 
-      <!-- Add semantic card classes here -->
+      <!-- Image Cards -->
       <span>
         <h4 class="text-center" id="fileTitle">List of Files</h4>
         <v-row>
           <v-card
             class="mx-auto my-12"
             max-width="250"
-            v-for="(file, index) in fileInfos"
+            v-for="(file, index) in fileInfos.slice(0, 15)"
             :key="index"
           >
             <p><a :href="file.url">{{ file.name }}</a></p>
@@ -118,6 +129,8 @@ export default {
           let prevMessage = this.message ? this.message + "\n" : "";
           this.message = prevMessage + response.data.message;
           console.log(response.data);
+          // this is the image to display
+          console.log(response.data.url);
 
           return FileUpload.getFiles();
         })
@@ -148,7 +161,19 @@ export default {
   .v-btn {
     padding-bottom: 3em;
   }
+  .v-alert {
+    padding: 1em;
+  }
+  .v-card {
+    padding: 1em;
+  }
+  #progress-section {
+    padding: 1em;
+  }
+  #alert-message {
+    padding: 1em;
+  }
   #fileTitle {
-    padding-top: 3em;
+    padding-top: 1em;
   }
 </style>

@@ -8,8 +8,8 @@ class UploadFilesService {
 
     console.log(file);
 
-    // return HTTP.post("/index.php", formData, {
-    return HTTP.post("/photos", formData, {
+    return HTTP.post("/uploads", formData, {
+    // return HTTP.post("/photos", formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       },
@@ -18,8 +18,8 @@ class UploadFilesService {
   }
 
   getFiles() {
-    return HTTP.get("/photos");
-    // return HTTP.get("/images");
+    // return HTTP.get("/photos");
+    return HTTP.get("/images");
   }
 }
 
