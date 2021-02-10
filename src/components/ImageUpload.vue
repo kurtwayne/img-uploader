@@ -2,28 +2,28 @@
   <v-container>
     <div v-if="progressInfos">
       <v-row class="text-center" justify="center">
-      <div class="mb-2"
-        v-for="(progressInfo, index) in progressInfos"
-        :key="index"
-      >
-      
-      <!-- Upload Progress Bars -->
-      <div id="progress-section">
-        <v-progress-linear
-          v-model="progressInfo.percentage"
-          color="blue"
-          height="25"
+        <div class="mb-2"
+          v-for="(progressInfo, index) in progressInfos"
+          :key="index"
         >
-          <strong>{{ progressInfo.percentage }}%</strong>
-        </v-progress-linear>
-        <div v-if="progressInfo.percentage === !100">
-          <h4>{{ progressInfo.fileName }} Uploading</h4>
+          <!-- Upload Progress Bars -->
+          <div id="progress-section">
+            <div v-if="!progressInfo.success">
+              <v-progress-linear
+                indeterminate
+                color="blue"
+                height="25"
+              >
+                <strong>Uploading</strong>
+              </v-progress-linear>
+              <h4>{{ progressInfo.fileName }} Uploading</h4>
+            </div>
+            <div v-else>
+              <v-icon x-large color="blue">mdi-file-check</v-icon>
+              <h4>{{ progressInfo.fileName }} Uploaded</h4>
+            </div>
+          </div>
         </div>
-        <div v-else>
-          <h4>{{ progressInfo.fileName }} Uploaded</h4>
-        </div>
-        </div>
-      </div>
       </v-row>
 
       <!-- File Upload -->
@@ -50,7 +50,7 @@
 
       <!-- Alert Messages -->
       <v-row justify="center">
-        <div v-if="message" role="alert" id="alert-message">
+        <div v-if="errorMessage" role="alert" id="alert-message">
           <v-alert
           outlined
           type="warning"
@@ -59,7 +59,7 @@
           dismissible
           >
           <ul>
-            <li v-for="(ms, i) in message.split('\n')" :key="i">
+            <li v-for="(ms, i) in errorMessage.split('\n')" :key="i">
               {{ ms }}
               <div>{{ log(ms) }}</div>
             </li>
@@ -70,16 +70,16 @@
 
       <!-- Image Cards -->
       <span>
-        <h4 class="text-center" id="fileTitle">List of Files</h4>
+        <h4 class="text-center" id="fileTitle">List of Images</h4>
         <v-row>
           <v-card
             class="mx-auto my-12"
             max-width="250"
-            v-for="(file, index) in fileInfos.slice(0, 15)"
-            :key="index"
+            v-for="data in resData"
+            :key="data.id"
           >
-            <p><a :href="file.url">{{ file.name }}</a></p>
-            <img :src="file.url" :alt="file.name" height="80px">
+            <p><a :href="data.url">{{ data.id }}</a></p>
+            <img :src="data.url" :alt="data.url" height="80px">
           </v-card>
         </v-row>
       </span>
@@ -89,7 +89,8 @@
 </template>
 
 <script>
-import FileUpload from "../services/FileUploadsService";
+// import FileUpload from "../services/FileUploadsService";
+import axios from 'axios';
 
 export default {
   name: "image-upload",
@@ -97,7 +98,9 @@ export default {
     return {
       selectedFiles: undefined,
       progressInfos: [],
-      message: "",
+      errorMessage: "",
+      resData: [],
+      id: 0,
 
       fileInfos: [],
     };
@@ -118,39 +121,28 @@ export default {
       }
     },
     upload(idx, file) {
-      this.progressInfos[idx] = { percentage: 0, fileName: file.name };
-
-      FileUpload.upload(file, (event) => {
-        this.progressInfos[idx].percentage = Math.round(
-          (100 * event.loaded) / event.total
-        );
-      })
-        .then((response) => {
-          let prevMessage = this.message ? this.message + "\n" : "";
-          this.message = prevMessage + response.data.message;
-          console.log(response.data);
-          // this is the image to display
-          console.log(response.data.url);
-
-          return FileUpload.getFiles();
-        })
-        .then((files) => {
-          this.fileInfos = files.data;
-        })
-        .catch(() => {
-          this.progressInfos[idx].percentage = 0;
-          this.message = "Could not upload the file:" + file.name;
+      this.progressInfos[idx] = { percentage: 0, success: false, fileName: file.name };
+      let formData = new FormData();
+      formData.append("file", file);
+      const headers = { 
+        "Content-Type": "multipart/form-data"
+      };
+      // POST request using axios with error handling
+      axios.post("https://test.rxflodev.com/uploads/", formData, {headers})
+        .then(response => {
+          this.resData.push({url: response.data.url, id: this.id++})
+          console.log(this.resData)
+          this.progressInfos[idx].success = true;
+          })
+        .catch(error => {
+          this.errorMessage += error.message;
+          console.error("There was an error!", error);
         });
     },
     clear () {
-      this.message = "";
+      this.errorMessage = "";
     },
-  },
-  mounted() {
-    FileUpload.getFiles().then((response) => {
-      this.fileInfos = response.data;
-    });
-  },
+  }
 };
 </script>
 
