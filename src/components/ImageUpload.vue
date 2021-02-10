@@ -49,7 +49,7 @@
       </v-row>
 
       <!-- Alert Messages -->
-      <v-row justify="center">
+      <v-row justify="center" id="divide">
         <div v-if="errorMessage" role="alert" id="alert-message">
           <v-alert
           outlined
@@ -69,7 +69,8 @@
       </v-row>
 
       <!-- Image Cards -->
-      <span>
+      <div>
+        <v-divider></v-divider>
         <h4 class="text-center" id="fileTitle">List of Images</h4>
         <v-row>
           <v-card
@@ -82,7 +83,7 @@
             <img :src="data.url" :alt="data.url" height="80px">
           </v-card>
         </v-row>
-      </span>
+      </div>
 
     </div>
   </v-container>
@@ -154,6 +155,9 @@ export default {
   }
   .v-card {
     padding: 1em;
+  }
+  #divide {
+    padding: 2em;
   }
   #progress-section {
     padding: 1em;
