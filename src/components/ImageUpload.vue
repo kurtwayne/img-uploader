@@ -29,7 +29,7 @@
       <!-- File Upload -->
       <v-row justify="center">
         <v-file-input
-          label="File input"
+          label="Select Images"
           filled
           prepend-icon="mdi-camera"
           accept="image/*"
