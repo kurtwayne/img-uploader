@@ -1,20 +1,20 @@
 <template>
     <v-app>
-      <HelloWorld/>
+      <Logo/>
       <ImageUpload/>
     </v-app>
 </template>
 
 <script>
 import ImageUpload from './components/ImageUpload'
-import HelloWorld from './components/HelloWorld'
+import Logo from './components/Logo'
 
 export default {
   name: 'App',
 
   components: {
     ImageUpload,
-    HelloWorld
+    Logo
   },
 
   data: () => ({

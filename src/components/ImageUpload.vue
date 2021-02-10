@@ -75,7 +75,7 @@
           <v-card
             class="mx-auto my-12"
             max-width="250"
-            v-for="data in resData"
+            v-for="data in resData.slice().reverse()"
             :key="data.id"
           >
             <p><a :href="data.url">{{ data.id }}</a></p>
@@ -89,7 +89,6 @@
 </template>
 
 <script>
-// import FileUpload from "../services/FileUploadsService";
 import axios from 'axios';
 
 export default {
@@ -101,7 +100,6 @@ export default {
       errorMessage: "",
       resData: [],
       id: 0,
-
       fileInfos: [],
     };
   },
@@ -127,11 +125,9 @@ export default {
       const headers = { 
         "Content-Type": "multipart/form-data"
       };
-      // POST request using axios with error handling
       axios.post("https://test.rxflodev.com/uploads/", formData, {headers})
         .then(response => {
           this.resData.push({url: response.data.url, id: this.id++})
-          console.log(this.resData)
           this.progressInfos[idx].success = true;
           })
         .catch(error => {
